@@ -130,21 +130,27 @@ export default function LandingPage() {
             <Link
               key={category.id}
               href={`/categories/${category.slug}`}
-              className="group relative rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-fuchsia-300 transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1.5"
+              className="group relative rounded-3xl overflow-hidden bg-white border border-fuchsia-100 shadow-md hover:shadow-2xl hover:shadow-[#D81B60]/15 hover:border-[#D81B60]/50 transition-all duration-500 flex flex-col h-full transform hover:-translate-y-2"
             >
-              {/* Studio Framed Image Container (Full Image Visible with Studio Shadow) */}
-              <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#FAF5FF] via-[#FDFBF9] to-[#FFF5F8] p-3 overflow-hidden border-b border-fuchsia-100/70 flex items-center justify-center">
+              {/* Highlighted & Attractive Full-Bleed Image Showcase */}
+              <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-900 flex items-center justify-center">
                 <Image
                   src={category.image_url || 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80'}
                   alt={category.name}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-contain p-1.5 drop-shadow-md group-hover:scale-106 transition-transform duration-500 ease-out"
+                  className="object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
                 />
                 
+                {/* Rich Subtle Gradient & Vignette Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-75 group-hover:opacity-55 transition-opacity" />
+
+                {/* Shimmer Light Reflection on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                
                 {/* Top Left Verified Artisan Badge */}
-                <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#3D1466] border border-fuchsia-200/90 text-[10px] font-black uppercase tracking-wider shadow-xs">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D81B60] animate-pulse" />
+                <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#3D1466] border border-white/80 text-[10px] font-black uppercase tracking-wider shadow-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E60067] animate-pulse"></span>
                   <span>Artisan Verified</span>
                 </div>
               </div>
@@ -162,7 +168,7 @@ export default function LandingPage() {
 
                 {/* Explore Collection Action Button */}
                 <div className="pt-2">
-                  <div className="w-full py-2.5 rounded-xl bg-fuchsia-50 group-hover:bg-gradient-to-r group-hover:from-[#3D1466] group-hover:to-[#D81B60] text-[#3D1466] group-hover:text-white text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-xs">
+                  <div className="w-full py-2.5 rounded-xl bg-gradient-to-r from-fuchsia-50 to-pink-50 border border-fuchsia-100/80 group-hover:border-transparent group-hover:from-[#3D1466] group-hover:to-[#D81B60] text-[#3D1466] group-hover:text-white text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-xs group-hover:shadow-md">
                     <span>Explore Collection</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
