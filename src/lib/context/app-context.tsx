@@ -21,9 +21,9 @@ interface AppContextType {
   user: Profile | null;
   role: UserRole;
   sellerProfile: Seller | null;
-  login: (email: string, role?: UserRole) => void;
+  login: (email: string, role?: UserRole, userProfile?: Profile) => void;
   logout: () => void;
-  register: (name: string, email: string, role: UserRole) => void;
+  register: (name: string, email: string, role: UserRole, profileData?: Partial<Profile>) => void;
   switchRole: (newRole: UserRole) => void;
 
   // Catalog
@@ -110,6 +110,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Sync state with localStorage if available
   useEffect(() => {
+    const savedUser = localStorage.getItem('sispace_user');
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        setUser(parsed);
+        if (parsed.role) setRole(parsed.role);
+      } catch (e) {}
+    }
     const savedCart = localStorage.getItem('sispace_cart') || localStorage.getItem('herhub_cart');
     if (savedCart) {
       try { setCart(JSON.parse(savedCart)); } catch (e) {}
@@ -133,21 +141,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const login = (email: string, targetRole: UserRole = 'customer') => {
+  const login = (email: string, targetRole: UserRole = 'customer', userProfile?: Profile) => {
+    if (userProfile) {
+      setUser(userProfile);
+      setRole(userProfile.role || targetRole);
+      setSellerProfile(userProfile.role === 'seller' ? INITIAL_SELLERS[0] : null);
+      localStorage.setItem('sispace_user', JSON.stringify(userProfile));
+      showToast(`Welcome back, ${userProfile.full_name || email}!`, 'success');
+      return;
+    }
+
     if (targetRole === 'admin' || email.includes('admin')) {
       setUser(DEMO_ADMIN_PROFILE);
       setRole('admin');
       setSellerProfile(null);
+      localStorage.setItem('sispace_user', JSON.stringify(DEMO_ADMIN_PROFILE));
       showToast('Logged in as Platform Admin', 'success');
     } else if (targetRole === 'seller' || email.includes('seller')) {
       setUser(DEMO_SELLER_PROFILE);
       setRole('seller');
       setSellerProfile(INITIAL_SELLERS[0]);
+      localStorage.setItem('sispace_user', JSON.stringify(DEMO_SELLER_PROFILE));
       showToast('Logged in as Vendor (Amina Artisanal)', 'success');
     } else {
-      setUser({ ...DEMO_CUSTOMER, email });
+      const cust = { ...DEMO_CUSTOMER, email };
+      setUser(cust);
       setRole('customer');
       setSellerProfile(null);
+      localStorage.setItem('sispace_user', JSON.stringify(cust));
       showToast(`Welcome back, ${email.split('@')[0]}!`, 'success');
     }
   };
@@ -156,21 +177,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setRole('customer');
     setSellerProfile(null);
+    localStorage.removeItem('sispace_user');
     showToast('Logged out successfully', 'info');
   };
 
-  const register = (name: string, email: string, targetRole: UserRole) => {
+  const register = (name: string, email: string, targetRole: UserRole, profileData?: Partial<Profile>) => {
     const newProfile: Profile = {
-      id: `prof-${Date.now()}`,
+      id: profileData?.id || `prof-${Date.now()}`,
       email,
       full_name: name,
       role: targetRole,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      phone: profileData?.phone || undefined,
+      avatar_url: profileData?.avatar_url || undefined,
+      created_at: profileData?.created_at || new Date().toISOString(),
+      updated_at: profileData?.updated_at || new Date().toISOString()
     };
     setUser(newProfile);
     setRole(targetRole);
-    showToast('Account created successfully!', 'success');
+    localStorage.setItem('sispace_user', JSON.stringify(newProfile));
+    showToast('Account registered successfully in Supabase!', 'success');
   };
 
   const switchRole = (newRole: UserRole) => {

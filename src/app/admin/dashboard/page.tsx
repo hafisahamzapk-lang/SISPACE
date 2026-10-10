@@ -39,6 +39,9 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="flex flex-wrap gap-2 text-xs font-bold">
+          <Link href="/admin/customers" className="px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white transition-colors shadow-sm">
+            Customers Directory
+          </Link>
           <Link href="/admin/sellers" className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm">
             Seller Queue ({pendingSellers.length})
           </Link>

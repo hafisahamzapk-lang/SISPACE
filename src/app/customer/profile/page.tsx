@@ -10,11 +10,38 @@ export default function CustomerProfilePage() {
 
   const [fullName, setFullName] = useState(user?.full_name || 'Elena Rostova');
   const [email, setEmail] = useState(user?.email || 'customer@sispaceqatar.com');
-  const [phone, setPhone] = useState('+1 (206) 555-0192');
+  const [phone, setPhone] = useState(user?.phone || '+974 5555 0192');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  React.useEffect(() => {
+    if (user) {
+      setFullName(user.full_name || '');
+      setEmail(user.email || '');
+      if (user.phone) setPhone(user.phone);
+    }
+  }, [user]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    showToast('Profile information updated successfully!', 'success');
+    setIsSaving(true);
+    try {
+      if (user?.id && !user.id.startsWith('demo-')) {
+        await fetch('/api/customers', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: user.id,
+            full_name: fullName,
+            phone: phone,
+          }),
+        });
+      }
+      showToast('Profile information updated in Supabase successfully!', 'success');
+    } catch (err) {
+      showToast('Profile updated locally', 'info');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

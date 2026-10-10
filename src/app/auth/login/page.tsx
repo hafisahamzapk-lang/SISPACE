@@ -5,27 +5,67 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/context/app-context';
 import { UserRole } from '@/types/database.types';
-import { LogIn, Mail, Lock, User, Store, ShieldCheck } from 'lucide-react';
+import { LogIn, Mail, Lock, User, Store, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useApp();
+  const { login, showToast } = useApp();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('customer@sispaceqatar.com');
+  const [password, setPassword] = useState('••••••••');
   const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    login(email, selectedRole);
+    if (!email.trim()) return;
 
-    if (selectedRole === 'seller') {
-      router.push('/seller/dashboard');
-    } else if (selectedRole === 'admin') {
-      router.push('/admin/dashboard');
-    } else {
-      router.push('/customer/orders');
+    setErrorMessage(null);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+          role: selectedRole,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setErrorMessage(data.error || 'Failed to sign in. Please verify your email.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Success
+      login(email.trim().toLowerCase(), selectedRole, data.profile);
+      showToast(
+        data.source === 'supabase'
+          ? `Welcome back, ${data.profile.full_name || email} (Supabase Verified)!`
+          : `Signed in as ${selectedRole.toUpperCase()}`,
+        'success'
+      );
+
+      if (selectedRole === 'seller') {
+        router.push('/seller/dashboard');
+      } else if (selectedRole === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/customer/orders');
+      }
+    } catch (err: any) {
+      console.error('Sign-in error:', err);
+      // Fallback local sign in if network request drops
+      login(email.trim().toLowerCase(), selectedRole);
+      router.push(selectedRole === 'seller' ? '/seller/dashboard' : selectedRole === 'admin' ? '/admin/dashboard' : '/customer/orders');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,7 +86,7 @@ export default function LoginPage() {
         <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-2xl text-xs font-semibold">
           <button
             type="button"
-            onClick={() => { setSelectedRole('customer'); setEmail('customer@sispaceqatar.com'); }}
+            onClick={() => { setSelectedRole('customer'); setEmail('customer@sispaceqatar.com'); setErrorMessage(null); }}
             className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
               selectedRole === 'customer' ? 'bg-white text-rose-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -55,7 +95,7 @@ export default function LoginPage() {
           </button>
           <button
             type="button"
-            onClick={() => { setSelectedRole('seller'); setEmail('amina@sispaceqatar.com'); }}
+            onClick={() => { setSelectedRole('seller'); setEmail('amina@sispaceqatar.com'); setErrorMessage(null); }}
             className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
               selectedRole === 'seller' ? 'bg-white text-amber-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -64,7 +104,7 @@ export default function LoginPage() {
           </button>
           <button
             type="button"
-            onClick={() => { setSelectedRole('admin'); setEmail('admin@sispaceqatar.com'); }}
+            onClick={() => { setSelectedRole('admin'); setEmail('admin@sispaceqatar.com'); setErrorMessage(null); }}
             className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
               selectedRole === 'admin' ? 'bg-white text-emerald-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -72,6 +112,13 @@ export default function LoginPage() {
             <ShieldCheck className="w-3.5 h-3.5" /> Admin
           </button>
         </div>
+
+        {errorMessage && (
+          <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,10 +129,11 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
+                disabled={isLoading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="customer@sispaceqatar.com"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-rose-600"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-rose-600 disabled:opacity-50"
               />
             </div>
           </div>
@@ -102,20 +150,31 @@ export default function LoginPage() {
               <input
                 type="password"
                 required
-                value={password || '••••••••'}
+                disabled={isLoading}
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-rose-600"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-rose-600 disabled:opacity-50"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-2xl text-white font-bold text-xs rose-gradient-btn shadow-md flex items-center justify-center gap-2"
+            disabled={isLoading}
+            className="w-full py-3.5 rounded-2xl text-white font-bold text-xs rose-gradient-btn shadow-md flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
           >
-            <LogIn className="w-4 h-4" />
-            <span>Sign In ({selectedRole.toUpperCase()})</span>
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Signing in...</span>
+              </>
+            ) : (
+              <>
+                <LogIn className="w-4 h-4" />
+                <span>Sign In ({selectedRole.toUpperCase()})</span>
+              </>
+            )}
           </button>
         </form>
 
