@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 140" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient for Icon Badge -->
+    <linearGradient id="herhub-badge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48" />
+      <stop offset="50%" stop-color="#be123c" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+
+    <!-- Text Gradient -->
+    <linearGradient id="herhub-text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#be123c" />
+      <stop offset="60%" stop-color="#881337" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="badge-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#be123c" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Logo Mark Container -->
+  <g filter="url(#badge-shadow)">
+    <!-- Rounded Squircle Icon Badge -->
+    <rect x="15" y="15" width="110" height="110" rx="30" fill="url(#herhub-badge-grad)" />
+
+    <!-- Stylized 'H' & Lotus/Heart Emblem inside Badge -->
+    <!-- Left Pillar -->
+    <path d="M 45 42 Q 45 38 49 38 L 55 38 Q 59 38 59 42 L 59 98 Q 59 102 55 102 L 49 102 Q 45 102 45 98 Z" fill="#ffffff" />
+    
+    <!-- Right Pillar -->
+    <path d="M 81 42 Q 81 38 85 38 L 91 38 Q 95 38 95 42 L 95 98 Q 95 102 91 102 L 85 102 Q 81 102 81 98 Z" fill="#ffffff" />
+
+    <!-- Central Lotus Flower / Crown Arch Connecting Pillar -->
+    <path d="M 57 70 C 62 58, 70 54, 70 46 C 70 54, 78 58, 83 70 C 77 66, 73 66, 70 73 C 67 66, 63 66, 57 70 Z" fill="#fef08a" />
+    
+    <!-- Arch Bridge -->
+    <path d="M 59 66 Q 70 74 81 66 L 81 74 Q 70 82 59 74 Z" fill="#ffffff" opacity="0.95" />
+  </g>
+
+  <!-- Brand Typography -->
+  <!-- Main Title: HerHub -->
+  <text x="148" y="78" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="52" letter-spacing="-1.5" fill="url(#herhub-text-grad)">
+    HerHub
+  </text>
+
+  <!-- Subtitle Tagline: ARTISAN MARKETPLACE -->
+  <text x="152" y="102" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="13" letter-spacing="3.5" fill="#e11d48" opacity="0.9">
+    ARTISAN MARKETPLACE
+  </text>
+
+  <!-- Decorative Accent Dot -->
+  <circle cx="340" cy="46" r="5" fill="#d97706" />
+</svg>
