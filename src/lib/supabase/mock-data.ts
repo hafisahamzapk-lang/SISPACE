@@ -11,17 +11,17 @@ export const INITIAL_CATEGORIES: Category[] = [
   },
   {
     id: 'cat-2',
-    name: 'Premium Hijabs & Accessories',
+    name: 'Feminineza Store: Hijabs & Modest Nighties',
     slug: 'premium-hijabs-accessories',
-    description: 'Chiffon, jersey, shimmer & kids hijabs by Feminineza Store (Mamoura, Qatar).',
+    description: 'Chiffon, jersey, shimmer hijabs & soft modest Dubai nighties (4 PC for QAR 100) by Feminineza Store (Mamoura, Qatar).',
     image_url: '/images/qatar/feminineza_hijabs_flyer.jpg',
     created_at: new Date().toISOString()
   },
   {
     id: 'cat-3',
-    name: 'Modest Dubai Nighties & Apparel',
+    name: 'Feminineza Modest Dubai Nighties & Apparel',
     slug: 'modest-dubai-apparel',
-    description: 'Soft, premium quality fabric modest dresses & Dubai nighties (4 PC for QAR 100).',
+    description: 'Soft, premium quality fabric modest dresses & Dubai nighties (4 PC for QAR 100) by Feminineza Store (Mamoura, Qatar).',
     image_url: '/images/qatar/dubai_nighties_flyer.jpg',
     created_at: new Date().toISOString()
   },
